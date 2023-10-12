@@ -10,15 +10,13 @@
 
 #install.packages('tidyverse')
 library(tidyverse)
-#install.packages('patchwork')
-library(patchwork)
 #install.packages('vegan')
 library(vegan)
 
 # Install data ------------------------------------------------------------
 
 insect_data <- read.csv('group1_leaf_litter_data_new.csv') %>%
-  select(1:26) %>% 
+  select(1:26) %>%
   mutate(wood_name = as.factor(wood_name)) %>%
   mutate(transect_point = as.factor(transect_point)) %>%
   select(transect_point, isopods:dermaptera) %>%
@@ -38,7 +36,7 @@ species_data <-
 
 View(species_data)
 
-alpha_data <- 
+alpha_data <-
   read.csv('group1_leaf_litter_alpha_diversity_data.csv', header = TRUE)
 
 View(alpha_data)
@@ -76,17 +74,60 @@ glm_matrix %>%
     fill = combination
   )) +
   geom_col() +
-  geom_text(vjust = -0.5) +
+  ggtitle("Alpha Diversity Using Spearman's Rank") +
+  geom_text(vjust = -0.5, 
+            size = 5) +
+  scale_fill_manual(values = c("darkorange2", "#00AEDA", "#00B159")) +
   theme(
     axis.title.x = element_blank(),
     panel.background = element_blank(),
     panel.grid.major = element_line(colour = "lightgrey"),
     axis.line = element_line(colour = "black"),
-    legend.position = "none"
+    legend.position = "none",
+    axis.text = element_text(size = 13),
+    axis.title = element_text(size = 15,
+                              face = "bold"),
+    plot.title = element_text(size = 17,
+                              face = "bold")
   )
 
-ggsave("alpha_diversity_hist.jpeg")
+ggsave("alpha_diversity_hist.jpeg",
+       width = 16,
+       height = 9,
+       units = "in")
 
 # Histogram ---------------------------------------------------------------
 
+species_data %>%
+  pivot_longer(cols = Grassland:Woodland,
+               names_to = "Habitat",
+               values_to = "Frequency") %>%
+  ggplot(aes(
+    x = reorder(str_to_title(species), Frequency),
+    y = Frequency,
+    fill = Habitat
+  )) +
+  geom_col() +
+  coord_flip() +
+  ylab("Total Frequency") +
+  xlab("Order") +
+  ggtitle("Invertabrate Diversity Across the Transects") +
+  scale_fill_manual(values = c("darkorange2", "#00AEDA", "#00B159")) +
+  theme(
+    panel.background = element_blank(),
+    panel.grid.major = element_line(colour = "lightgrey"),
+    axis.line = element_line(colour = "black"),
+    axis.text = element_text(size = 13),
+    axis.title = element_text(size = 15,
+                              face = "bold"),
+    legend.text = element_text(size = 13),
+    legend.title = element_text(size = 15, 
+                                face = "bold"),
+    plot.title = element_text(size = 17,
+                              face = "bold")
+  )
 
+ggsave("species_hist.jpeg",
+       width = 16,
+       height = 9,
+       units = "in")
